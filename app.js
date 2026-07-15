@@ -4,11 +4,11 @@
 const STORAGE_KEY = 'maarechet-copy-v1';
 const WELCOME_KEY = 'maarechet-copy-welcomed';
 const DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו'];
-const LESSON_TYPES = ['פרונטלי', 'מגמה', 'פרטני', 'שהות', 'תפקיד', 'שחרית', 'ייעוץ', 'אחר'];
+const LESSON_TYPES = ['פרונטלי', 'פרטני', 'שהות'];
 // מיפוי סוג שעה -> קטגוריית מכסה
 const TYPE_TO_CAT = {
-  'פרונטלי': 'frontal', 'מגמה': 'frontal', 'שחרית': 'frontal', 'אחר': 'frontal',
-  'פרטני': 'prati', 'תפקיד': 'prati', 'ייעוץ': 'prati',
+  'פרונטלי': 'frontal',
+  'פרטני': 'prati',
   'שהות': 'shehut'
 };
 const CAT_LABELS = { frontal: 'פרונטלי', prati: 'פרטני', shehut: 'שהות' };
