@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתכנן מערכת השעות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+
+<div id="welcome-screen" class="welcome-screen" hidden>
+  <div class="welcome-card">
+    <div class="lock-logo">🗓️</div>
+    <h2>ברוכים הבאים למתכנן מערכת השעות!</h2>
+    <p class="welcome-sub">כלי לתכנון ובנייה של מערכת השעות הבית-ספרית — מקלידים שיבוץ פעם אחת, והוא מסתנכרן לכל הלוחות והתצוגות.</p>
+    <div class="welcome-features">
+      <div>📋 <b>לוח כיתות ולוח מורים מסונכרנים</b> — כל שינוי מתעדכן בכל מקום</div>
+      <div>🔗 <b>שיעורים משותפים וחלוקה לקבוצות</b> — מקבצים, מגמות, מתקדמים/בסיס, מורה לכל כיתה</div>
+      <div>⚠️ <b>זיהוי התנגשויות</b> — התראה כשמורה משובץ בשני מקומות, וחסימת ימים חופשיים</div>
+      <div>📊 <b>מעקב מכסות</b> — שעות כל מורה מול המכסה (פרונטלי+פרטני+שהות) ותקן שעות כיתתי</div>
+      <div>🧑‍🎓 <b>שיוך תלמידים ודוח פיצולים</b> — מי בכל קבוצה, ומי עדיין לא שובץ</div>
+      <div>📋 <b>שכפול שיבוצים ובלוקים</b> — בונים פעם אחת ומדביקים בקליק</div>
+      <div>🖨️ <b>הדפסות</b> — סדין מלא, מערכות אישיות לכיתה/מורה (עמוד לכל אחת)</div>
+      <div>💾 <b>גיבוי ושחזור</b> — הנתונים נשמרים בדפדפן בלבד; מומלץ להוריד גיבוי (⬇) בסוף כל עבודה!</div>
+    </div>
+    <p class="welcome-disclaimer">⚖️ <b>הסרת אחריות:</b> המערכת פותחה באופן אישי וניסיוני ומסופקת כפי-שהיא (AS-IS), ללא אחריות מכל סוג. הנתונים נשמרים בדפדפן המשתמש בלבד ובאחריותו לגבותם. אין המפתחת אחראית לכל אובדן מידע או נזק הנובע מהשימוש במערכת.</p>
+    <p class="welcome-credit">🧪 ממעבדת הניסויים של מרי גרבי</p>
+    <button class="btn primary" id="welcome-close">הבנתי — בואו נתחיל 🚀</button>
+  </div>
+</div>
+
+<header class="app-header no-print">
+  <div class="header-title">
+    <span class="logo">🗓️</span>
+    <div>
+      <h1 id="school-title">מתכנן מערכת השעות</h1>
+      <p id="year-subtitle">שנה"ל תשפ"ז</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button id="btn-about" class="btn ghost" title="על המערכת">ℹ️ אודות</button>
+    <span id="save-indicator" class="save-indicator" title="הנתונים נשמרים אוטומטית בדפדפן">✓ נשמר</span>
+    <button id="btn-export" class="btn ghost" title="הורדת קובץ גיבוי של כל הנתונים">⬇ גיבוי</button>
+    <button id="btn-import" class="btn ghost" title="טעינת קובץ גיבוי">⬆ שחזור</button>
+    <input type="file" id="import-file" accept=".json" hidden>
+  </div>
+</header>
+
+<nav class="tabs no-print" id="tabs">
+  <button class="tab active" data-tab="classes-board">📋 לוח כיתות</button>
+  <button class="tab" data-tab="teachers-board">👩‍🏫 לוח מורים</button>
+  <button class="tab" data-tab="quotas">📊 מכסות</button>
+  <button class="tab" data-tab="personal">🖨️ מערכת אישית</button>
+  <button class="tab" data-tab="setup">⚙️ הגדרות</button>
+</nav>
+
+<div id="copy-bar" class="copy-bar no-print" hidden>
+  <span>📋 <b>מצב שכפול פעיל:</b> <span id="copy-bar-text"></span> — לחצי על תאים בלוח כדי להדביק עותק (שיבוץ בלי כיתה, כמו שהות, אפשר להדביק גם בלוח המורים)</span>
+  <button class="btn small" id="copy-bar-end">✔ סיום</button>
+</div>
+
+<div id="conflict-bar" class="conflict-bar no-print" hidden>
+  <button id="conflict-toggle" class="conflict-toggle">⚠️ <span id="conflict-count"></span> התראות (התנגשויות / חסר מורה) — לחצי לפירוט</button>
+  <div id="conflict-list" class="conflict-list" hidden></div>
+</div>
+
+<main>
+  <!-- לוח כיתות -->
+  <section id="tab-classes-board" class="tab-panel active">
+    <div class="board-hint no-print">לחיצה על תא פותחת חלונית שיבוץ. שיעור משותף לכמה כיתות מופיע בכולן אוטומטית.
+      <button class="btn small" id="btn-print-classes">🖨️ הדפסת הסדין המלא</button></div>
+    <div class="board-wrap" id="classes-board-wrap"></div>
+  </section>
+
+  <!-- לוח מורים -->
+  <section id="tab-teachers-board" class="tab-panel">
+    <div class="board-hint no-print">כאן משבצים גם שעות ללא כיתה (שהות / פרטני / תפקיד). הסיכום בראש כל עמודה מתעדכן חי: פרונטלי + פרטני + שהות.
+      <button class="btn small" id="btn-print-teachers">🖨️ הדפסת הסדין המלא</button></div>
+    <div class="board-wrap" id="teachers-board-wrap"></div>
+  </section>
+
+  <!-- מכסות -->
+  <section id="tab-quotas" class="tab-panel">
+    <div class="quotas-grid">
+      <div class="quota-section">
+        <h2>👩‍🏫 מכסות מורים</h2>
+        <p class="section-hint">נספר בפועל מול המכסה: פרונטלי + פרטני + שהות</p>
+        <div id="teacher-quotas"></div>
+      </div>
+      <div class="quota-section">
+        <h2>🏫 מכסות כיתות לפי מקצוע</h2>
+        <p class="section-hint">כמה שעות שובצו בפועל מול התקן שהוגדר בהגדרות</p>
+        <div id="class-quotas"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- מערכת אישית -->
+  <section id="tab-personal" class="tab-panel">
+    <div class="personal-controls no-print">
+      <label>הצגת מערכת של:</label>
+      <select id="personal-kind">
+        <option value="class">כיתה</option>
+        <option value="teacher">מורה</option>
+        <option value="splits">🧑‍🎓 דוח פיצולים ותלמידים</option>
+      </select>
+      <select id="personal-target"></select>
+      <button id="btn-print" class="btn primary">🖨️ הדפסת הנבחר/ת</button>
+      <button id="btn-print-multi" class="btn">🖨️ הדפסת מערכות... (בחירה)</button>
+    </div>
+    <div id="print-picker" class="print-picker no-print" hidden>
+      <div class="grade-btns">
+        <b>אילו מערכות להדפיס? (עמוד לכל אחת)</b>
+        <button class="btn small" id="picker-all" type="button">סמני הכל</button>
+        <button class="btn small" id="picker-none" type="button">נקי</button>
+      </div>
+      <div id="picker-list" class="check-list"></div>
+      <button class="btn primary" id="picker-print" type="button">🖨️ הדפסה (<span id="picker-count">0</span> מערכות)</button>
+    </div>
+    <div id="personal-view" class="personal-view print-area"></div>
+  </section>
+
+  <!-- הגדרות -->
+  <section id="tab-setup" class="tab-panel">
+    <div class="setup-grid">
+
+      <div class="setup-card" id="card-general">
+        <h2>🏷️ פרטים כלליים</h2>
+        <div class="form-row"><label>שם בית הספר</label><input type="text" id="set-school-name" placeholder="בית ספר יעד"></div>
+        <div class="form-row"><label>שנת לימודים</label><input type="text" id="set-year" placeholder='תשפ"ז'></div>
+        <div class="form-row"><label>שעות ביום (א׳–ה׳)</label><input type="number" id="set-hours-default" min="1" max="12"></div>
+        <div class="form-row"><label>שעות ביום שישי</label><input type="number" id="set-hours-friday" min="0" max="12"></div>
+      </div>
+
+      <div class="setup-card" id="card-teachers">
+        <h2>👩‍🏫 מורים <button class="btn small add" id="btn-add-teacher">+ הוספה</button></h2>
+        <p class="section-hint">מכסה שבועית: פרונטלי + פרטני + שהות (כמו 22+4+8)</p>
+        <div class="table-scroll"><table class="setup-table" id="teachers-table"></table></div>
+      </div>
+
+      <div class="setup-card" id="card-classes">
+        <h2>🏫 כיתות <button class="btn small add" id="btn-add-class">+ הוספה</button></h2>
+        <p class="section-hint">אפשר להוסיף ולמחוק כיתות בחופשיות — כל חלוקה שתרצי</p>
+        <div class="table-scroll"><table class="setup-table" id="classes-table"></table></div>
+      </div>
+
+      <div class="setup-card" id="card-subjects">
+        <h2>📚 מקצועות <button class="btn small add" id="btn-add-subject">+ הוספה</button></h2>
+        <div class="table-scroll"><table class="setup-table" id="subjects-table"></table></div>
+      </div>
+
+      <div class="setup-card" id="card-students">
+        <h2>🧑‍🎓 תלמידים</h2>
+        <p class="section-hint">השמות מופיעים רק במערכות המורים ובדוח הפיצולים — לא בלוח הכיתות ולא בהדפסת הסדין.</p>
+        <div class="form-row"><label>כיתה</label><select id="students-class-select"></select></div>
+        <textarea id="students-paste" rows="4" placeholder="שם תלמיד/ה בכל שורה — אפשר להדביק רשימה שלמה"></textarea>
+        <button class="btn small add" id="btn-add-students">+ הוספת הרשימה לכיתה</button>
+        <div id="students-list" class="students-list"></div>
+      </div>
+
+      <div class="setup-card wide" id="card-class-quotas">
+        <h2>🎯 תקן שעות שבועי לכיתה לפי מקצוע</h2>
+        <p class="section-hint">כמה שעות מכל מקצוע מגיעות לכל כיתה בשבוע (למשל: אנגלית 4, מדעים 5). השאירי ריק אם לא רלוונטי.</p>
+        <div class="table-scroll"><table class="setup-table matrix" id="class-quotas-table"></table></div>
+      </div>
+
+      <div class="setup-card wide danger-zone" id="card-data">
+        <h2>🗄️ נתונים</h2>
+        <p class="section-hint">🤖 <b>טיפ — עבודה עם קלוד:</b> מורידים קובץ גיבוי (⬇ בכותרת), מעבירים אותו לשיחה עם קלוד ומבקשים ניתוח, בדיקה או השלמת שיבוצים — ואת הקובץ שחוזר מעלים עם ⬆ שחזור.</p>
+        <div class="data-actions">
+          <button class="btn" id="btn-load-sample">📥 טעינת רשימות לדוגמה (מורים, כיתות, מקצועות — בלי שיבוצים)</button>
+          <button class="btn danger" id="btn-clear-lessons">🧹 מחיקת כל השיבוצים (הרשימות נשארות)</button>
+          <button class="btn danger" id="btn-clear-all">🗑️ איפוס מלא של כל הנתונים</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- חלונית שיבוץ -->
+<div id="modal-backdrop" class="modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 id="modal-title">שיבוץ שיעור</h3>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="slot-lessons" class="slot-lessons"></div>
+      <div id="smart-suggestions" class="sugg-box" hidden></div>
+      <div class="form-row" id="subject-row">
+        <label>מקצוע</label>
+        <input type="text" id="lesson-subject" list="subjects-datalist" autocomplete="off"
+               placeholder="הקלידי — יעלו הצעות; שם חדש ייווצר אוטומטית">
+        <datalist id="subjects-datalist"></datalist>
+      </div>
+      <div class="form-row">
+        <label>סוג שעה</label>
+        <select id="lesson-type"></select>
+      </div>
+      <div class="form-row">
+        <label>כיתות <span class="mini-hint">(אפשר לסמן כמה)</span></label>
+        <div class="teacher-pick">
+          <div class="grade-btns"><button class="btn small" id="check-all-classes" type="button">סמני הכל</button><span id="grade-buttons"></span></div>
+          <div id="lesson-classes" class="check-list"></div>
+        </div>
+      </div>
+      <div class="form-row" id="assign-mode-row" hidden>
+        <label>אופן השיבוץ</label>
+        <div class="radio-group">
+          <label class="radio-line"><input type="radio" name="assign-mode" value="together" checked> 🔗 שיעור משותף — אותם מורים מלמדים את כל הכיתות יחד (מקבץ)</label>
+          <label class="radio-line"><input type="radio" name="assign-mode" value="split"> 🏠 שיבוץ נפרד לכל כיתה — מורה משלה, ואפשר גם מקצוע שונה לכל כיתה</label>
+        </div>
+      </div>
+      <div class="form-row" id="teachers-row">
+        <label>מורים <span class="mini-hint">(אפשר לסמן כמה; בלי סימון כלל = ❓ חסר מורה)</span></label>
+        <div class="teacher-pick">
+          <input type="text" id="teacher-filter" autocomplete="off"
+                 placeholder="הקלידי שם — הרשימה מסתננת; שם חדש אפשר להוסיף בלחיצה">
+          <div id="lesson-teachers" class="check-list"></div>
+          <button type="button" class="btn small add" id="btn-new-teacher-inline" hidden></button>
+        </div>
+      </div>
+      <div class="form-row" id="teacher-mode-row" hidden>
+        <label>מה כל מורה עושה</label>
+        <div class="radio-group">
+          <label class="radio-line"><input type="radio" name="teacher-mode" value="together" checked> 🤝 מלמדים יחד את אותו השיעור</label>
+          <label class="radio-line"><input type="radio" name="teacher-mode" value="each"> 📚 חלוקה לקבוצות — כל מורה לוקח/ת קבוצה עם מקצוע משלו (מתקדמים/בסיס, עד 3 קבוצות ויותר)</label>
+        </div>
+      </div>
+      <div class="form-row" id="split-subjects-row" hidden>
+        <label>מקצוע וקבוצה לכל מורה</label>
+        <div id="split-subjects" class="split-list"></div>
+        <datalist id="group-datalist">
+          <option value="מתקדמים"></option>
+          <option value="בסיס"></option>
+          <option value="קבוצה 1"></option>
+          <option value="קבוצה 2"></option>
+          <option value="קבוצה 3"></option>
+          <option value="שאר הכיתה"></option>
+          <option value="מגמה"></option>
+          <option value="מגמת אומנות"></option>
+          <option value="מגמת מלונאות"></option>
+          <option value="מגמת עיצוב שיער"></option>
+        </datalist>
+      </div>
+      <div class="form-row" id="split-teachers-row" hidden>
+        <label>מורה ומקצוע לכל כיתה <span class="mini-hint">(ברירת מחדל: המחנכת + המקצוע שלמעלה)</span></label>
+        <div id="split-teachers" class="split-list"></div>
+      </div>
+      <div class="form-row" id="students-row" hidden>
+        <label>תלמידים <span class="mini-hint">(🕐 טרם שובץ בכלל · ⚠️ כבר בקבוצה אחרת בשעה זו)</span></label>
+        <div class="teacher-pick">
+          <button type="button" class="btn small" id="students-toggle">🧑‍🎓 שיוך תלמידים לקבוצה (<span id="students-count">0</span> מסומנים)</button>
+          <div id="students-box" hidden>
+            <div id="lesson-students" class="check-list"></div>
+            <label class="sync-line" id="students-sync-row" hidden>
+              <input type="checkbox" id="students-sync" checked>
+              🔁 לעדכן את השמות גם ב-<span id="students-sync-count"></span> המשבצות הנוספות של הקבוצה הזו (אותה מורה, מקצוע וכיתה)
+            </label>
+            <div class="grade-btns">
+              <input type="text" id="new-student-name" placeholder="שם תלמיד/ה חדש/ה..." style="flex:1;min-width:140px">
+              <select id="new-student-class" hidden></select>
+              <button type="button" class="btn small add" id="btn-new-student">➕ הוספה</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>הערה</label>
+        <input type="text" id="lesson-note" placeholder="למשל: בנים / מתקדמים / מקבץ...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn danger" id="lesson-delete" hidden>🗑️ מחיקת שיבוץ</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" id="lesson-cancel">ביטול</button>
+      <button class="btn primary" id="lesson-save">💾 שמירה</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-credit no-print">🧪 ממעבדת הניסויים של מרי גרבי</footer>
+
+<div id="print-sheets"></div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js?v=1"></script>
+</body>
+</html>
