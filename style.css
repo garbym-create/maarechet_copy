@@ -166,6 +166,10 @@ td.slot.flash { animation: flash 1.6s ease; }
 .chip .chip-subject { font-weight: 700; display: block; }
 .chip .chip-teachers { color: #4d4a5e; display: block; font-size: .76rem; }
 .chip .chip-teachers.missing { color: var(--warn); font-weight: 800; }
+.chip .chip-coteacher { display: block; font-size: .72rem; color: #00795f; font-weight: 700; }
+.chip .chip-parallel { display: block; font-size: .72rem; color: #6c5ce7; font-weight: 700; }
+.pc-co { color: #00795f; font-weight: 700; }
+.pc-parallel { color: #5b47c9; font-weight: 700; }
 .chip .chip-note { color: var(--muted); font-size: .72rem; display: block; }
 .chip .chip-type { font-size: .68rem; background: rgba(255,255,255,.65); border-radius: 6px; padding: 0 5px; }
 .chip.shared::after { content: "🔗"; font-size: .7rem; float: left; }
@@ -420,22 +424,24 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
 .sheet-title { text-align: center; font-size: 12pt; margin: 0 0 4pt; font-family: 'Heebo', sans-serif; }
 table.sheet-table { --fs: 1; width: 100%; border-collapse: collapse; table-layout: fixed; }
 .sheet-table th, .sheet-table td {
-  border: .5pt solid #777; padding: 0.5pt 2pt; text-align: center; vertical-align: top;
-  font-size: calc(6.5pt * var(--fs)); line-height: 1.15; overflow: hidden;
+  border: .6pt solid #333; padding: 0.5pt 2pt; text-align: center; vertical-align: top;
+  font-size: calc(7.5pt * var(--fs)); line-height: 1.15; overflow: hidden;
+  color: #000; font-weight: 600;
 }
-.sheet-table th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: calc(7.5pt * var(--fs)); }
-.sheet-table th small { font-weight: 400; font-size: calc(6pt * var(--fs)); }
+.sheet-table th { background: #e3e3e3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: calc(8.5pt * var(--fs)); font-weight: 800; }
+.sheet-table th small { font-weight: 600; font-size: calc(7pt * var(--fs)); }
 .sheet-table .w1 { width: 18pt; }
-.sheet-table .dcell { font-weight: 800; font-size: calc(9pt * var(--fs)); background: #f4f4f4 !important; }
-.sheet-table .hcell { font-weight: 700; color: #555; }
-.sheet-table tr.day-start th, .sheet-table tr.day-start td { border-top: 1.5pt solid #333; }
-.pcell { border-bottom: .25pt dotted #aaa; }
+.sheet-table .dcell { font-weight: 800; font-size: calc(10pt * var(--fs)); background: #eee !important; }
+.sheet-table .hcell { font-weight: 800; color: #000; }
+.sheet-table tr.day-start th, .sheet-table tr.day-start td { border-top: 1.6pt solid #000; }
+.pcell { border-bottom: .3pt dotted #666; }
 .pcell:last-child { border-bottom: none; }
-.pcell i { color: #555; font-style: normal; }
+.pcell b { font-weight: 800; }
+.pcell i { color: #222; font-style: normal; }
 .pc-missing { font-weight: 800; }
-.sheet-title small { font-weight: 400; font-size: 9pt; color: #555; }
-.sheet-table .offcell { background: #efefef !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #999; }
-.pc-students { color: #444; }
+.sheet-title small { font-weight: 600; font-size: 9pt; color: #222; }
+.sheet-table .offcell { background: #e9e9e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #777; }
+.pc-students { color: #222; }
 
 /* פאנל בחירת מערכות להדפסה */
 .print-picker {

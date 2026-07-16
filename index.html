@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -23,7 +23,7 @@
       <div>📊 <b>מעקב מכסות</b> — שעות כל מורה מול המכסה (פרונטלי+פרטני+שהות) ותקן שעות כיתתי</div>
       <div>🧑‍🎓 <b>שיוך תלמידים ודוח פיצולים</b> — מי בכל קבוצה, ומי עדיין לא שובץ</div>
       <div>📋 <b>שכפול שיבוצים ובלוקים</b> — בונים פעם אחת ומדביקים בקליק</div>
-      <div>🖨️ <b>הדפסות</b> — סדין מלא, מערכות אישיות לכיתה/מורה (עמוד לכל אחת)</div>
+      <div>🖨️ <b>הדפסות וייצוא</b> — סדין מלא, מערכות אישיות, ואקסל/וורד</div>
       <div>💾 <b>גיבוי ושחזור</b> — הנתונים נשמרים בדפדפן בלבד; מומלץ להוריד גיבוי (⬇) בסוף כל עבודה!</div>
     </div>
     <p class="welcome-disclaimer">⚖️ <b>הסרת אחריות:</b> המערכת פותחה באופן אישי וניסיוני ומסופקת כפי-שהיא (AS-IS), ללא אחריות מכל סוג. הנתונים נשמרים בדפדפן המשתמש בלבד ובאחריותו לגבותם. אין המפתחת אחראית לכל אובדן מידע או נזק הנובע מהשימוש במערכת.</p>
@@ -71,14 +71,18 @@
   <!-- לוח כיתות -->
   <section id="tab-classes-board" class="tab-panel active">
     <div class="board-hint no-print">לחיצה על תא פותחת חלונית שיבוץ. שיעור משותף לכמה כיתות מופיע בכולן אוטומטית.
-      <button class="btn small" id="btn-print-classes">🖨️ הדפסת הסדין המלא</button></div>
+      <button class="btn small" id="btn-print-classes">🖨️ הדפסת הסדין המלא</button>
+      <button class="btn small" id="btn-xls-classes">⬇ אקסל</button>
+      <button class="btn small" id="btn-doc-classes">⬇ וורד</button></div>
     <div class="board-wrap" id="classes-board-wrap"></div>
   </section>
 
   <!-- לוח מורים -->
   <section id="tab-teachers-board" class="tab-panel">
     <div class="board-hint no-print">כאן משבצים גם שעות ללא כיתה (שהות / פרטני / תפקיד). הסיכום בראש כל עמודה מתעדכן חי: פרונטלי + פרטני + שהות.
-      <button class="btn small" id="btn-print-teachers">🖨️ הדפסת הסדין המלא</button></div>
+      <button class="btn small" id="btn-print-teachers">🖨️ הדפסת הסדין המלא</button>
+      <button class="btn small" id="btn-xls-teachers">⬇ אקסל</button>
+      <button class="btn small" id="btn-doc-teachers">⬇ וורד</button></div>
     <div class="board-wrap" id="teachers-board-wrap"></div>
   </section>
 
@@ -136,8 +140,9 @@
       </div>
 
       <div class="setup-card" id="card-teachers">
-        <h2>👩‍🏫 מורים <button class="btn small add" id="btn-add-teacher">+ הוספה</button></h2>
-        <p class="section-hint">מכסה שבועית: פרונטלי + פרטני + שהות (כמו 22+4+8)</p>
+        <h2>👩‍🏫 מורים <button class="btn small add" id="btn-add-teacher">+ הוספה</button>
+          <button class="btn small" id="btn-sort-teachers" title="מיון חד-פעמי; אחר-כך מכווננים בחצים">↕️ מחנכות תחילה</button></h2>
+        <p class="section-hint">מכסה שבועית: פרונטלי + פרטני + שהות (כמו 22+4+8). חצי הסדר קובעים את סדר העמודות בלוח המורים ובהדפסות.</p>
         <div class="table-scroll"><table class="setup-table" id="teachers-table"></table></div>
       </div>
 
@@ -289,6 +294,6 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
