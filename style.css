@@ -291,6 +291,14 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
 .splits-missing { color: var(--warn); font-weight: 700; background: var(--warn-soft); }
 .splits-never { background: var(--pend-soft); border-radius: 10px; padding: 6px 10px; margin: 4px 0 8px; font-size: .9rem; }
 
+/* חצי סידור המורים */
+.order-cell { white-space: nowrap; }
+.btn-move {
+  background: none; border: none; cursor: pointer;
+  font-size: .8rem; opacity: .5; padding: 0 1px; color: var(--primary);
+}
+.btn-move:hover { opacity: 1; }
+
 .btn-del { background: none; border: none; cursor: pointer; font-size: .95rem; opacity: .55; }
 .btn-del:hover { opacity: 1; }
 .data-actions { display: flex; gap: 10px; flex-wrap: wrap; }

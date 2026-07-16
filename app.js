@@ -552,7 +552,7 @@ function renderSetup() {
       const q = t.quota || {};
       const fd = t.freeDays || [];
       return '<tr data-id="' + t.id + '">' +
-        '<td class="order-cell"><button class="btn-del" data-mv="up" title="הזזה למעלה">▲</button><button class="btn-del" data-mv="down" title="הזזה למטה">▼</button></td>' +
+        '<td class="order-cell"><button class="btn-move" data-mv="up" title="הזזה למעלה">▲</button><button class="btn-move" data-mv="down" title="הזזה למטה">▼</button></td>' +
         '<td><input type="text" data-f="name" value="' + esc(t.name) + '"></td>' +
         '<td><select data-f="role"><option' + (t.role === 'מחנכת' ? ' selected' : '') + '>מחנכת</option><option' + (t.role === 'מקצועי' ? ' selected' : '') + '>מקצועי</option></select></td>' +
         '<td><input type="number" min="0" data-f="frontal" value="' + (+q.frontal || 0) + '"></td>' +
@@ -561,7 +561,7 @@ function renderSetup() {
         '<td><span class="fd-wrap" title="סימון יום = המורה לא זמין/ה ביום זה">' +
           DAYS.map(d => '<label class="fd"><input type="checkbox" data-fd="' + d + '"' + (fd.includes(d) ? ' checked' : '') + '><span>' + d + '</span></label>').join('') +
         '</span></td>' +
-        '<td><button class="btn-del" title="מחיקה">🗑️</button></td></tr>';
+        '<td><button class="btn-del" data-del-row title="מחיקה">🗑️</button></td></tr>';
     }).join('');
   tt.querySelectorAll('tr[data-id]').forEach(tr => {
     const t = teacher(tr.dataset.id);
@@ -582,7 +582,7 @@ function renderSetup() {
       [state.teachers[i], state.teachers[j]] = [state.teachers[j], state.teachers[i]];
       save(); renderSetup(); renderAllBoards();
     }));
-    tr.querySelector('.btn-del').addEventListener('click', () => {
+    tr.querySelector('[data-del-row]').addEventListener('click', () => {
       const used = state.lessons.filter(l => l.teacherIds.includes(t.id)).length;
       if (!confirm('למחוק את ' + t.name + '?' + (used ? ' (משובץ/ת ב-' + used + ' שיעורים — השיבוצים יוסרו ממנו/ה)' : ''))) return;
       state.lessons.forEach(l => l.teacherIds = l.teacherIds.filter(x => x !== t.id));
