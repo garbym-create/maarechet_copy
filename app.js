@@ -579,7 +579,9 @@ function renderSetup() {
       return '<tr data-id="' + t.id + '">' +
         '<td class="order-cell"><span class="drag-grip" title="גררי כדי לסדר">⠿</span><button class="btn-move" data-mv="up" title="הזזה למעלה">▲</button><button class="btn-move" data-mv="down" title="הזזה למטה">▼</button></td>' +
         '<td><input type="text" data-f="name" value="' + esc(t.name) + '"></td>' +
-        '<td><select data-f="role"><option' + (t.role === 'מחנכת' ? ' selected' : '') + '>מחנכת</option><option' + (t.role === 'מקצועי' ? ' selected' : '') + '>מקצועי</option></select></td>' +
+        '<td><select data-f="role">' +
+          ['מחנכת', 'מקצועי', 'תרפיה', 'אחר'].map(r => '<option' + (t.role === r ? ' selected' : '') + '>' + r + '</option>').join('') +
+        '</select></td>' +
         '<td><input type="number" min="0" data-f="frontal" value="' + (+q.frontal || 0) + '"></td>' +
         '<td><input type="number" min="0" data-f="prati" value="' + (+q.prati || 0) + '"></td>' +
         '<td><input type="number" min="0" data-f="shehut" value="' + (+q.shehut || 0) + '"></td>' +
