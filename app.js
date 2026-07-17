@@ -537,6 +537,30 @@ function slotHasMissing(slot, roster) {
   return roster.some(s => !inSlot.has(s.id));
 }
 
+/* ===== גרירת שורות מורים לסידור ===== */
+// בזמן גרירה — סידור חי של שורות ה-DOM; בסיום — הסדר נכתב ל-state.teachers ונשמר
+function teachersTableDragover(e) {
+  const dragging = document.querySelector('#teachers-table tr.dragging');
+  if (!dragging) return;
+  e.preventDefault();
+  const target = e.target.closest('tr[data-id]');
+  if (!target || target === dragging) return;
+  const rect = target.getBoundingClientRect();
+  const after = e.clientY > rect.top + rect.height / 2;
+  target.parentNode.insertBefore(dragging, after ? target.nextSibling : target);
+}
+
+function applyTeacherRowOrder() {
+  const ids = [...document.querySelectorAll('#teachers-table tr[data-id]')].map(r => r.dataset.id);
+  const newOrder = ids.map(id => teacher(id)).filter(Boolean);
+  if (newOrder.length !== state.teachers.length) return; // בטיחות — לא מאבדים אף מורה
+  const changed = newOrder.some((t, i) => state.teachers[i].id !== t.id);
+  if (!changed) return;
+  state.teachers = newOrder;
+  save(); renderSetup(); renderAllBoards();
+  toast('✓ הסדר החדש נשמר');
+}
+
 /* ===== הגדרות ===== */
 function renderSetup() {
   const s = state.settings;
@@ -547,12 +571,13 @@ function renderSetup() {
 
   // מורים
   const tt = document.getElementById('teachers-table');
+  tt.ondragover = teachersTableDragover; // מאזין יחיד (onX — לא נערם ברינדורים חוזרים)
   tt.innerHTML = '<tr><th title="סדר התצוגה בלוחות ובהדפסות">סדר</th><th>שם</th><th>תפקיד</th><th>פרונטלי</th><th>פרטני</th><th>שהות</th><th>ימים חופשיים</th><th></th></tr>' +
     state.teachers.map(t => {
       const q = t.quota || {};
       const fd = t.freeDays || [];
       return '<tr data-id="' + t.id + '">' +
-        '<td class="order-cell"><button class="btn-move" data-mv="up" title="הזזה למעלה">▲</button><button class="btn-move" data-mv="down" title="הזזה למטה">▼</button></td>' +
+        '<td class="order-cell"><span class="drag-grip" title="גררי כדי לסדר">⠿</span><button class="btn-move" data-mv="up" title="הזזה למעלה">▲</button><button class="btn-move" data-mv="down" title="הזזה למטה">▼</button></td>' +
         '<td><input type="text" data-f="name" value="' + esc(t.name) + '"></td>' +
         '<td><select data-f="role"><option' + (t.role === 'מחנכת' ? ' selected' : '') + '>מחנכת</option><option' + (t.role === 'מקצועי' ? ' selected' : '') + '>מקצועי</option></select></td>' +
         '<td><input type="number" min="0" data-f="frontal" value="' + (+q.frontal || 0) + '"></td>' +
@@ -582,6 +607,19 @@ function renderSetup() {
       [state.teachers[i], state.teachers[j]] = [state.teachers[j], state.teachers[i]];
       save(); renderSetup(); renderAllBoards();
     }));
+    // גרירה לסידור — נדלקת רק מהידית ⠿ כדי לא לשבש את שדות הקלט בשורה
+    const grip = tr.querySelector('.drag-grip');
+    grip.addEventListener('mousedown', () => { tr.draggable = true; });
+    tr.addEventListener('dragstart', e => {
+      tr.classList.add('dragging');
+      if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', t.id); }
+    });
+    tr.addEventListener('dragend', () => {
+      tr.classList.remove('dragging');
+      tr.draggable = false;
+      applyTeacherRowOrder();
+    });
+    tr.addEventListener('mouseup', () => { tr.draggable = false; });
     tr.querySelector('[data-del-row]').addEventListener('click', () => {
       const used = state.lessons.filter(l => l.teacherIds.includes(t.id)).length;
       if (!confirm('למחוק את ' + t.name + '?' + (used ? ' (משובץ/ת ב-' + used + ' שיעורים — השיבוצים יוסרו ממנו/ה)' : ''))) return;
@@ -602,13 +640,13 @@ function renderSetup() {
       '<td><select data-f="homeroom"><option value="">—</option>' +
       state.teachers.map(t => '<option value="' + t.id + '"' + (c.homeroomTeacherId === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') +
       '</select></td>' +
-      '<td><button class="btn-del" title="מחיקה">🗑️</button></td></tr>'
+      '<td><button class="btn-del" data-del-row title="מחיקה">🗑️</button></td></tr>'
     ).join('');
   ct.querySelectorAll('tr[data-id]').forEach(tr => {
     const c = klass(tr.dataset.id);
     tr.querySelector('[data-f="name"]').addEventListener('change', e => { c.name = e.target.value.trim() || c.name; save(); renderAllBoards(); });
     tr.querySelector('[data-f="homeroom"]').addEventListener('change', e => { c.homeroomTeacherId = e.target.value || null; save(); renderAllBoards(); });
-    tr.querySelector('.btn-del').addEventListener('click', () => {
+    tr.querySelector('[data-del-row]').addEventListener('click', () => {
       const used = state.lessons.filter(l => l.classIds.includes(c.id)).length;
       if (!confirm('למחוק את כיתה ' + c.name + '?' + (used ? ' (יש לה ' + used + ' שיבוצים — הם יוסרו ממנה)' : ''))) return;
       state.lessons.forEach(l => l.classIds = l.classIds.filter(x => x !== c.id));
@@ -628,13 +666,13 @@ function renderSetup() {
       '<tr data-id="' + sb.id + '">' +
       '<td><input type="text" data-f="name" value="' + esc(sb.name) + '"></td>' +
       '<td><input type="color" data-f="color" value="' + sb.color + '"></td>' +
-      '<td><button class="btn-del" title="מחיקה">🗑️</button></td></tr>'
+      '<td><button class="btn-del" data-del-row title="מחיקה">🗑️</button></td></tr>'
     ).join('');
   st.querySelectorAll('tr[data-id]').forEach(tr => {
     const sb = subject(tr.dataset.id);
     tr.querySelector('[data-f="name"]').addEventListener('change', e => { sb.name = e.target.value.trim() || sb.name; save(); renderAllBoards(); });
     tr.querySelector('[data-f="color"]').addEventListener('change', e => { sb.color = e.target.value; save(); renderAllBoards(); });
-    tr.querySelector('.btn-del').addEventListener('click', () => {
+    tr.querySelector('[data-del-row]').addEventListener('click', () => {
       if (!confirm('למחוק את המקצוע ' + sb.name + '? שיבוצים קיימים יישארו בלי מקצוע.')) return;
       state.lessons.forEach(l => { if (l.subjectId === sb.id) l.subjectId = null; });
       state.classes.forEach(c => c.subjectQuotas = (c.subjectQuotas || []).filter(q => q.subjectId !== sb.id));

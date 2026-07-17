@@ -291,8 +291,11 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
 .splits-missing { color: var(--warn); font-weight: 700; background: var(--warn-soft); }
 .splits-never { background: var(--pend-soft); border-radius: 10px; padding: 6px 10px; margin: 4px 0 8px; font-size: .9rem; }
 
-/* חצי סידור המורים */
+/* חצי סידור המורים + ידית גרירה */
 .order-cell { white-space: nowrap; }
+.drag-grip { cursor: grab; color: var(--muted); font-size: 1rem; user-select: none; padding: 0 3px; }
+.drag-grip:active { cursor: grabbing; }
+#teachers-table tr.dragging { opacity: .45; background: var(--primary-soft); }
 .btn-move {
   background: none; border: none; cursor: pointer;
   font-size: .8rem; opacity: .5; padding: 0 1px; color: var(--primary);
