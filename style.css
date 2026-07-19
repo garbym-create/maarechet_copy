@@ -435,8 +435,9 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
 
 /* פוטר קרדיט */
 .site-credit {
-  text-align: center; padding: 14px; color: var(--muted); font-size: .88rem;
+  text-align: center; padding: 14px; color: var(--muted); font-size: .88rem; line-height: 1.6;
 }
+.site-credit .copyright { font-size: .78rem; opacity: .85; }
 
 /* ===== Toast ===== */
 .toast {
