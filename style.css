@@ -388,6 +388,24 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
   padding: 6px 10px; font-size: .85rem; color: #00795f;
 }
 
+/* ===== מסך נעילה ===== */
+.lock-screen {
+  position: fixed; inset: 0; z-index: 600;
+  background: linear-gradient(135deg, #6c5ce7 0%, #8e7cf3 60%, #a29bfe 100%);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.lock-card {
+  background: #fff; border-radius: 20px; padding: 36px 32px;
+  width: 360px; max-width: 100%; text-align: center;
+  box-shadow: 0 16px 50px rgba(0,0,0,.3);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.lock-card h2 { font-size: 1.3rem; }
+.lock-sub { margin: 0; color: var(--muted); font-size: .92rem; }
+.lock-card input { text-align: center; font-size: 1.1rem; padding: 10px; }
+.lock-card .btn { font-size: 1rem; padding: 10px; }
+.lock-error { margin: 0; color: var(--danger); font-weight: 700; font-size: .9rem; }
+
 /* ===== מסך פתיחה ===== */
 .welcome-screen {
   position: fixed; inset: 0; z-index: 500;
