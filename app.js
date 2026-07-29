@@ -7,10 +7,6 @@
 'use strict';
 
 const STORAGE_KEY = 'maarechet-copy-v1';
-const WELCOME_KEY = 'maarechet-copy-welcomed';
-const UNLOCK_KEY = 'maarechet-copy-unlocked';
-// טביעת אצבע (SHA-256) של הסיסמה — הסיסמה עצמה לא מופיעה בקוד
-const PASS_HASH = '3c6ac723ab296004e9cacf8f445315e75aba29fd72c80946af300d57222eddf2';
 const DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו'];
 const LESSON_TYPES = ['פרונטלי', 'פרטני', 'שהות'];
 // מיפוי סוג שעה -> קטגוריית מכסה
@@ -1745,48 +1741,16 @@ function renderAll() {
   renderPersonalTargets();
 }
 
-/* ===== נעילת סיסמה ===== */
-async function sha256hex(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function initLock() {
-  const screen = document.getElementById('lock-screen');
-  if (localStorage.getItem(UNLOCK_KEY) === '1') { screen.hidden = true; return; }
-  screen.hidden = false;
-  const input = document.getElementById('lock-input');
-  const tryUnlock = async () => {
-    let ok = false;
-    try { ok = (await sha256hex(input.value)) === PASS_HASH; } catch (e) { ok = false; }
-    if (ok) {
-      localStorage.setItem(UNLOCK_KEY, '1');
-      screen.hidden = true;
-    } else {
-      document.getElementById('lock-error').hidden = false;
-      input.value = '';
-      input.focus();
-    }
-  };
-  document.getElementById('lock-btn').addEventListener('click', tryUnlock);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
-  setTimeout(() => input.focus(), 50);
-}
-
-/* ===== מסך פתיחה — הסבר על המערכת והסרת אחריות ===== */
+/* ===== מסך פתיחה — נוהל אבטחה, הסבר על המערכת והסרת אחריות (מופיע בכל כניסה) ===== */
 function initWelcome() {
   const screen = document.getElementById('welcome-screen');
-  screen.hidden = localStorage.getItem(WELCOME_KEY) === '1';
-  document.getElementById('welcome-close').addEventListener('click', () => {
-    localStorage.setItem(WELCOME_KEY, '1');
-    screen.hidden = true;
-  });
+  screen.hidden = false; // מוצג בכל טעינה — נוהל האבטחה חייב להיראות
+  document.getElementById('welcome-close').addEventListener('click', () => { screen.hidden = true; });
   document.getElementById('btn-about').addEventListener('click', () => { screen.hidden = false; });
 }
 
 /* ===== אתחול ===== */
 function init() {
-  initLock();
   initWelcome();
   loadState();
   renderAll();

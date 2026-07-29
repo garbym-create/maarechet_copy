@@ -390,24 +390,6 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
   padding: 6px 10px; font-size: .85rem; color: #00795f;
 }
 
-/* ===== מסך נעילה ===== */
-.lock-screen {
-  position: fixed; inset: 0; z-index: 600;
-  background: linear-gradient(135deg, #6c5ce7 0%, #8e7cf3 60%, #a29bfe 100%);
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-}
-.lock-card {
-  background: #fff; border-radius: 20px; padding: 36px 32px;
-  width: 360px; max-width: 100%; text-align: center;
-  box-shadow: 0 16px 50px rgba(0,0,0,.3);
-  display: flex; flex-direction: column; gap: 12px;
-}
-.lock-card h2 { font-size: 1.3rem; }
-.lock-sub { margin: 0; color: var(--muted); font-size: .92rem; }
-.lock-card input { text-align: center; font-size: 1.1rem; padding: 10px; }
-.lock-card .btn { font-size: 1rem; padding: 10px; }
-.lock-error { margin: 0; color: var(--danger); font-weight: 700; font-size: .9rem; }
-
 /* ===== מסך פתיחה ===== */
 .welcome-screen {
   position: fixed; inset: 0; z-index: 500;
@@ -424,6 +406,12 @@ table.setup-table.matrix input[type="number"] { width: 58px; }
 .lock-logo { font-size: 3rem; }
 .welcome-card h2 { font-size: 1.35rem; }
 .welcome-sub { margin: 0; color: var(--muted); font-size: .95rem; }
+.welcome-security {
+  text-align: right; background: var(--danger-soft); border: 1.5px solid #f0b9b9;
+  border-radius: 12px; padding: 12px 16px; font-size: .9rem; color: #8a1f1f;
+}
+.welcome-security ul { margin: 6px 0 0; padding-inline-start: 20px; }
+.welcome-security li { margin: 3px 0; }
 .welcome-features {
   text-align: right; display: flex; flex-direction: column; gap: 7px;
   background: #f8f7fd; border-radius: 12px; padding: 14px 16px; font-size: .9rem;

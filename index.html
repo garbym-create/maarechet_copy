@@ -7,26 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
-
-<div id="lock-screen" class="lock-screen" hidden>
-  <div class="lock-card">
-    <div class="lock-logo">🗓️</div>
-    <h2>מתכנן מערכת השעות</h2>
-    <p class="lock-sub">🔒 הזינו סיסמה כדי להיכנס</p>
-    <input type="password" id="lock-input" placeholder="סיסמה" autocomplete="off">
-    <button class="btn primary" id="lock-btn">כניסה</button>
-    <p id="lock-error" class="lock-error" hidden>הסיסמה שגויה — נסו שוב</p>
-  </div>
-</div>
 
 <div id="welcome-screen" class="welcome-screen" hidden>
   <div class="welcome-card">
     <div class="lock-logo">🗓️</div>
     <h2>ברוכים הבאים למתכנן מערכת השעות!</h2>
     <p class="welcome-sub">כלי לתכנון ובנייה של מערכת השעות הבית-ספרית — מקלידים שיבוץ פעם אחת, והוא מסתנכרן לכל הלוחות והתצוגות.</p>
+    <div class="welcome-security">
+      🔒 <b>נוהל אבטחת מידע — חובה לקרוא:</b>
+      <ul>
+        <li>אין להעלות פרטים מזהים של תלמידים ומורים, מלבד שם פרטי.</li>
+        <li>יש להשתמש בחשבון הארגוני.</li>
+        <li>בהורדת קובץ יש לפעול לפי נוהל אבטחת מידע — לא לשלוח מחוץ למייל הארגוני.</li>
+      </ul>
+    </div>
     <div class="welcome-features">
       <div>📋 <b>לוח כיתות ולוח מורים מסונכרנים</b> — כל שינוי מתעדכן בכל מקום</div>
       <div>🔗 <b>שיעורים משותפים וחלוקה לקבוצות</b> — מקבצים, מגמות, מתקדמים/בסיס, מורה לכל כיתה</div>
@@ -309,6 +306,6 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js?v=9"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>
