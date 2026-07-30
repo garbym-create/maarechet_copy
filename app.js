@@ -446,6 +446,14 @@ function renderQuotas() {
 }
 
 /* ===== מערכת אישית ===== */
+function studentsSorted() {
+  return state.classes.flatMap(c => studentsOf(c.id));
+}
+function studentLessonsAt(st, day, hour) {
+  return state.lessons.filter(l => l.day === day && l.hour === hour && l.classIds.includes(st.classId) &&
+    (!lessonStudents(l).length || lessonStudents(l).includes(st.id)));
+}
+
 function renderPersonalTargets() {
   const kind = document.getElementById('personal-kind').value;
   const sel = document.getElementById('personal-target');
@@ -454,9 +462,14 @@ function renderPersonalTargets() {
   document.getElementById('btn-doc-splits').hidden = kind !== 'splits'; // וורד — רק לדוח הפיצולים
   document.getElementById('print-picker').hidden = true; // נסגר בהחלפת סוג
   if (kind === 'splits') return;
-  const items = kind === 'class' ? state.classes : orderedTeachers();
   const prev = sel.value;
-  sel.innerHTML = items.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('');
+  if (kind === 'student') {
+    sel.innerHTML = studentsSorted().map(s =>
+      '<option value="' + s.id + '">' + esc(s.name) + ' — ' + esc(klass(s.classId) ? klass(s.classId).name : '') + '</option>').join('');
+  } else {
+    const items = kind === 'class' ? state.classes : orderedTeachers();
+    sel.innerHTML = items.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('');
+  }
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
 }
 
@@ -466,13 +479,15 @@ function renderPersonal() {
   const id = document.getElementById('personal-target').value;
   const view = document.getElementById('personal-view');
   if (kind === 'splits') { renderSplitsReport(view); return; }
-  const target = kind === 'class' ? klass(id) : teacher(id);
+  const target = kind === 'class' ? klass(id) : kind === 'student' ? student(id) : teacher(id);
   if (!target) { view.innerHTML = '<p class="section-hint" style="text-align:center">אין נתונים להצגה עדיין.</p>'; return; }
 
   let sub = '';
   if (kind === 'class') {
     const hm = teacher(target.homeroomTeacherId);
     sub = hm ? 'מחנכת: ' + hm.name : '';
+  } else if (kind === 'student') {
+    sub = 'כיתה: ' + (klass(target.classId) ? klass(target.classId).name : '');
   } else {
     const c = teacherCounts(target.id); const q = target.quota || {};
     sub = 'פרונטלי ' + c.frontal + '/' + (+q.frontal || 0) + ' · פרטני ' + c.prati + '/' + (+q.prati || 0) + ' · שהות ' + c.shehut + '/' + (+q.shehut || 0);
@@ -489,9 +504,11 @@ function renderPersonal() {
         html += '<td style="background:#f3f2f8;color:#9a96ad">' + (h === 1 ? 'יום חופשי' : '') + '</td>';
         continue;
       }
-      const lessons = state.lessons.filter(l => l.day === day && l.hour === h &&
+      let lessons;
+      if (kind === 'student') lessons = studentLessonsAt(target, day, h);
+      else lessons = state.lessons.filter(l => l.day === day && l.hour === h &&
         (kind === 'class' ? l.classIds.includes(id) : l.teacherIds.includes(id)));
-      html += '<td>' + lessons.map(l => chipHtml(l, kind === 'class' ? 'class' : 'teacher', true, kind === 'class' ? id : undefined, kind === 'teacher' ? id : undefined)).join('') + '</td>';
+      html += '<td>' + lessons.map(l => chipHtml(l, kind === 'teacher' ? 'teacher' : 'class', kind !== 'student', kind === 'class' ? id : undefined, kind === 'teacher' ? id : undefined)).join('') + '</td>';
     }
     html += '</tr>';
   }
@@ -1584,7 +1601,8 @@ function personalCellHtml(l, kind, targetId) {
     const par = parallelTeacherNames(l, targetId);
     if (par.length) who += ' <span class="pc-parallel">‖ במקביל: ' + esc(par.join(', ')) + '</span>';
   }
-  const all = lessonStudents(l).map(s => student(s)).filter(Boolean);
+  // רשימת שמות תלמידים — לא במערכת של תלמיד/ה בודד/ת (מיותר)
+  const all = kind === 'student' ? [] : lessonStudents(l).map(s => student(s)).filter(Boolean);
   let stLine = '';
   if (all.length) {
     let shown = all, others = 0;
@@ -1600,6 +1618,8 @@ function personalPageHtml(kind, target) {
   if (kind === 'class') {
     const hm = teacher(target.homeroomTeacherId);
     subTitle = hm ? 'מחנכת: ' + hm.name : '';
+  } else if (kind === 'student') {
+    subTitle = 'כיתה: ' + (klass(target.classId) ? klass(target.classId).name : '');
   } else {
     const c = teacherCounts(target.id); const q = target.quota || {};
     subTitle = 'פרונטלי ' + c.frontal + '/' + (+q.frontal || 0) + ' · פרטני ' + c.prati + '/' + (+q.prati || 0) + ' · שהות ' + c.shehut + '/' + (+q.shehut || 0);
@@ -1615,8 +1635,10 @@ function personalPageHtml(kind, target) {
       if (kind === 'teacher' && (target.freeDays || []).includes(day)) {
         h += '<td class="offcell">' + (hr === 1 ? 'יום חופשי' : '') + '</td>'; continue;
       }
-      const ls = state.lessons.filter(l => l.day === day && l.hour === hr &&
-        (kind === 'class' ? l.classIds.includes(target.id) : l.teacherIds.includes(target.id)));
+      const ls = kind === 'student'
+        ? studentLessonsAt(target, day, hr)
+        : state.lessons.filter(l => l.day === day && l.hour === hr &&
+          (kind === 'class' ? l.classIds.includes(target.id) : l.teacherIds.includes(target.id)));
       h += '<td>' + ls.map(l => personalCellHtml(l, kind, target.id)).join('') + '</td>';
     }
     h += '</tr>';
@@ -1625,7 +1647,7 @@ function personalPageHtml(kind, target) {
 }
 
 function printPersonal(kind, targetIds) {
-  const pool = kind === 'class' ? state.classes : orderedTeachers();
+  const pool = kind === 'class' ? state.classes : kind === 'student' ? studentsSorted() : orderedTeachers();
   const targets = pool.filter(x => targetIds.includes(x.id));
   if (!targets.length) { toast('לא נבחרו מערכות להדפסה'); return; }
   document.getElementById('print-sheets').innerHTML = targets.map(t => personalPageHtml(kind, t)).join('');
@@ -1640,7 +1662,7 @@ function printPersonal(kind, targetIds) {
 /* ===== פאנל בחירת מערכות להדפסה ===== */
 function renderPrintPicker() {
   const kind = document.getElementById('personal-kind').value;
-  const pool = kind === 'class' ? state.classes : orderedTeachers();
+  const pool = kind === 'class' ? state.classes : kind === 'student' ? studentsSorted() : orderedTeachers();
   document.getElementById('picker-list').innerHTML = pool.map(x =>
     '<label><input type="checkbox" value="' + x.id + '" checked> ' + esc(x.name) + '</label>').join('');
   updatePickerCount();
