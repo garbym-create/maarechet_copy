@@ -449,9 +449,12 @@ function renderQuotas() {
 function studentsSorted() {
   return state.classes.flatMap(c => studentsOf(c.id));
 }
+// שיעורי התלמיד/ה בשעה נתונה. אם משובץ/ת לקבוצה ספציפית — נשלף/ת מהמליאה,
+// ומציגים רק את שיעורי הקבוצה שלו/ה. אחרת — שיעורי המליאה (בלי שיוך תלמידים).
 function studentLessonsAt(st, day, hour) {
-  return state.lessons.filter(l => l.day === day && l.hour === hour && l.classIds.includes(st.classId) &&
-    (!lessonStudents(l).length || lessonStudents(l).includes(st.id)));
+  const slot = state.lessons.filter(l => l.day === day && l.hour === hour && l.classIds.includes(st.classId));
+  const mine = slot.filter(l => lessonStudents(l).includes(st.id));
+  return mine.length ? mine : slot.filter(l => !lessonStudents(l).length);
 }
 
 function renderPersonalTargets() {
